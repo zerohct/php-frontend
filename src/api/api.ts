@@ -3,35 +3,46 @@ import { API_BASE_URL } from "../constants/apiEndpoints";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 10000,
   headers: {
-    "Content-Type": "multipart/form-data",
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
-  withCredentials: true,
 });
 
-// apiClient.interceptors.request.use(
-//   (config) => {
-//     // Use more robust token retrieval
-//     const authTokenString = sessionStorage.getItem("authToken");
+// Request interceptor
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-//     try {
-//       const authToken = authTokenString ? JSON.parse(authTokenString) : null;
+// Response interceptor
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-//       // Check if token exists and has not expired
-//       if (authToken && authToken.access_token) {
-//         config.headers.Authorization = `Bearer ${authToken.access_token}`;
-//       } else {
-//         // Force logout if no valid token
-//         logoutApi();
-//       }
-//     } catch (error) {
-//       console.error("Token parsing error:", error);
-//       logoutApi();
-//     }
+    // Handle 401 errors
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
 
-//     return config;
-//   },
-//   (error) => Promise.reject(error),
-// );
+    // Handle other errors
+    const errorMessage = error.response?.data?.message || "Đã có lỗi xảy ra";
+    console.error("API Error:", errorMessage);
+
+    return Promise.reject(error);
+  }
+);
 
 export default apiClient;

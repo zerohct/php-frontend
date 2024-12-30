@@ -1,7 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import { User, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import AuthApi from "../../api/AuthApi";
+import { LoginCredentials } from "../../types/auth";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const [credentials, setCredentials] = useState<LoginCredentials>({
+    username: "",
+    password: "",
+  });
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCredentials((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await AuthApi.login(credentials);
+
+      if (response.status === "success") {
+        // Chuyển hướng sau khi đăng nhập thành công
+        navigate("/"); // hoặc trang chính của bạn
+      } else {
+        setError("Đăng nhập không thành công");
+      }
+    } catch (err: any) {
+      setError(err.message || "Có lỗi xảy ra khi đăng nhập");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
@@ -19,8 +59,15 @@ const LoginPage = () => {
           </p>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 text-red-500 p-3 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
+
         {/* Form */}
-        <form className="mt-8 space-y-6">
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             {/* Username */}
             <div>
@@ -39,6 +86,8 @@ const LoginPage = () => {
                   name="username"
                   type="text"
                   required
+                  value={credentials.username}
+                  onChange={handleChange}
                   className="pl-10 block w-full rounded-lg border border-gray-300 py-3 px-4 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Nhập tên đăng nhập"
                 />
@@ -62,6 +111,8 @@ const LoginPage = () => {
                   name="password"
                   type="password"
                   required
+                  value={credentials.password}
+                  onChange={handleChange}
                   className="pl-10 block w-full rounded-lg border border-gray-300 py-3 px-4 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Nhập mật khẩu"
                 />
@@ -97,9 +148,15 @@ const LoginPage = () => {
           {/* Submit button */}
           <button
             type="submit"
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={loading}
+            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white
+              ${
+                loading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              }`}
           >
-            Đăng nhập
+            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
         </form>
 
