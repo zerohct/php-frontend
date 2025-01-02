@@ -13,7 +13,9 @@ export const API_ENDPOINTS = {
     LIST: `${API_BASE_URL}/ProductApi/cart`,
     ADD: `${API_BASE_URL}/ProductApi/addtocart`,
     DECREASE: `${API_BASE_URL}/ProductApi/decrease`,
+    INCREASE: `${API_BASE_URL}/ProductApi/increase`,
     CHECKOUT: `${API_BASE_URL}/ProductApi/checkout`,
+    REMOVE: `${API_BASE_URL}/ProductApi/removeFromCart`,
   },
   AUTH: {
     LOGIN: `${API_BASE_URL}/AccountApi/Login`,

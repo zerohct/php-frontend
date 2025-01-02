@@ -83,6 +83,17 @@ class ProductApiService {
     }
   }
 
+  async removeFromCart(productId: string) {
+    try {
+      const response = await apiClient.delete(
+        `${API_ENDPOINTS.CART.REMOVE}/${productId}`
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   async addToCart(productId: string) {
     try {
       const response = await apiClient.post(

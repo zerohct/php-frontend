@@ -31,6 +31,26 @@ const Cart = () => {
     }
   };
 
+  const handleRemoveItem = async (productId: number) => {
+    if (!productId) {
+      console.error("Invalid product ID");
+      return;
+    }
+
+    try {
+      setError(null);
+      const response = await productApi.removeFromCart(String(productId));
+      if (response?.status === "success") {
+        await fetchCartItems();
+      } else {
+        setError("Failed to remove item");
+      }
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+      setError("Failed to remove item");
+    }
+  };
+
   const handleIncreaseQuantity = async (productId: number) => {
     if (!productId) {
       console.error("Invalid product ID");
@@ -40,7 +60,7 @@ const Cart = () => {
     try {
       setError(null);
       const response = await productApi.addToCart(String(productId));
-      if (response?.data) {
+      if (response?.status === "success") {
         await fetchCartItems();
       } else {
         setError("Failed to update quantity");
@@ -60,7 +80,7 @@ const Cart = () => {
     try {
       setError(null);
       const response = await productApi.decreaseCartItem(String(productId));
-      if (response?.data) {
+      if (response?.status === "success") {
         await fetchCartItems();
       } else {
         setError("Failed to update quantity");
@@ -68,26 +88,6 @@ const Cart = () => {
     } catch (error) {
       console.error("Failed to decrease quantity:", error);
       setError("Failed to update quantity");
-    }
-  };
-
-  const handleRemoveItem = async (productId: number) => {
-    if (!productId) {
-      console.error("Invalid product ID");
-      return;
-    }
-
-    try {
-      setError(null);
-      const response = await productApi.decreaseCartItem(String(productId));
-      if (response?.data) {
-        await fetchCartItems();
-      } else {
-        setError("Failed to remove item");
-      }
-    } catch (error) {
-      console.error("Failed to remove item:", error);
-      setError("Failed to remove item");
     }
   };
 
