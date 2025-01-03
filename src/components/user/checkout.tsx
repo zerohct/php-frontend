@@ -36,12 +36,27 @@ const Checkout = () => {
     }
   };
 
+  // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await productApi.checkout(formData);
+  //     if (response?.status === "success") {
+  //       navigate("/order-success");
+  //     }
+  //   } catch (error) {
+  //     console.error("Checkout failed:", error);
+  //   }
+  // };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const response = await productApi.checkout(formData);
-      if (response?.status === "success") {
-        navigate("/order-success");
+      if (response?.status === "pending" && response.payment_url) {
+        // Chuyển hướng đến URL thanh toán
+        window.location.href = response.payment_url;
+      } else {
+        console.error("Failed to initiate payment:", response?.message);
       }
     } catch (error) {
       console.error("Checkout failed:", error);
