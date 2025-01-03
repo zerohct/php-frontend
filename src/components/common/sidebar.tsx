@@ -1,9 +1,13 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
-
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import AuthApi from "src/api/AuthApi";
 const AdminSidebar = () => {
   const location = useLocation();
-
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    AuthApi.logout();
+    navigate("/login");
+  };
   const menuItems = [
     {
       to: "/admin",
@@ -149,9 +153,7 @@ const AdminSidebar = () => {
             hover:bg-gray-700 hover:text-white
             active:transform active:scale-95
           "
-          onClick={() => {
-            /* Add logout logic */
-          }}
+          onClick={handleLogout}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

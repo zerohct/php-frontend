@@ -20,6 +20,36 @@ export interface CheckoutData {
   phone: string;
   address: string;
 }
+export interface Order {
+  order_id: number;
+  order_name: string;
+  phone: string;
+  address: string;
+  created_at: string;
+  product_name: string;
+  quantity: number;
+  price: string;
+}
+
+export interface OrderDetail {
+  product_id: number;
+  quantity: number;
+  price: number;
+  product_name: string;
+  product_image?: string;
+}
+
+export interface OrdersResponse {
+  status: string;
+  data: Order[];
+}
+
+export interface AllOrdersStats {
+  status: string;
+  data: {
+    total_orders: number;
+  };
+}
 
 class ProductApiService {
   async getAllProducts() {
@@ -130,6 +160,28 @@ class ProductApiService {
       const response = await apiClient.post(
         API_ENDPOINTS.CART.CHECKOUT,
         checkoutData
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async getUserOrders() {
+    try {
+      const response = await apiClient.get<OrdersResponse>(
+        API_ENDPOINTS.ORDERS.USER_ORDERS
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async getAllOrders() {
+    try {
+      const response = await apiClient.get<AllOrdersStats>(
+        API_ENDPOINTS.ORDERS.ALL_ORDERS
       );
       return response.data;
     } catch (error) {

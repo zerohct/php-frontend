@@ -17,6 +17,10 @@ export const API_ENDPOINTS = {
     CHECKOUT: `${API_BASE_URL}/ProductApi/processcheckout`,
     REMOVE: `${API_BASE_URL}/ProductApi/removeFromCart`,
   },
+  ORDERS: {
+    USER_ORDERS: `${API_BASE_URL}/ProductApi/getUserOrders`,
+    ALL_ORDERS: `${API_BASE_URL}/ProductApi/AllOrders`,
+  },
   AUTH: {
     LOGIN: `${API_BASE_URL}/AccountApi/Login`,
     REGISTER: `${API_BASE_URL}/AccountApi/Register`,

@@ -50,7 +50,7 @@ const Checkout = () => {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-8">Thanh toán</h1>
+      <h1 className="text-3xl font-bold mb-8">Thanh toán khi nhận hàng</h1>
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
