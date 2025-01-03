@@ -5,7 +5,7 @@ import AuthApi from "../../api/AuthApi";
 
 interface UserData {
   username: string;
-  roles?: string[];
+  roles: string[];
 }
 
 const UserMenu: React.FC = () => {
@@ -14,14 +14,14 @@ const UserMenu: React.FC = () => {
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Thêm hàm kiểm tra và cập nhật user data
   const checkAndUpdateUserData = () => {
     if (AuthApi.isAuthenticated()) {
       const username = AuthApi.getUsername();
+      const roles = AuthApi.getRoles(); // Assuming you'll add this method to AuthApi
       if (username) {
         setUserData({
           username: username,
-          roles: [], // Có thể thêm roles nếu cần
+          roles: roles || [], // Use roles from AuthApi
         });
       }
     } else {
@@ -30,20 +30,15 @@ const UserMenu: React.FC = () => {
   };
 
   useEffect(() => {
-    // Kiểm tra ngay khi component mount
     checkAndUpdateUserData();
 
-    // Thêm event listener để lắng nghe thay đổi trong sessionStorage
     const handleStorageChange = () => {
       checkAndUpdateUserData();
     };
 
     window.addEventListener("storage", handleStorageChange);
-
-    // Kiểm tra mỗi khi focus vào window
     window.addEventListener("focus", checkAndUpdateUserData);
 
-    // Click outside to close
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
@@ -52,13 +47,17 @@ const UserMenu: React.FC = () => {
 
     document.addEventListener("mousedown", handleClickOutside);
 
-    // Cleanup
     return () => {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("focus", checkAndUpdateUserData);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []); // Empty dependency array but with better event handling
+  }, []);
+
+  useEffect(() => {
+    const intervalId = setInterval(checkAndUpdateUserData, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   const handleLogout = () => {
     AuthApi.logout();
@@ -67,11 +66,7 @@ const UserMenu: React.FC = () => {
     navigate("/login");
   };
 
-  // Thêm một useEffect để kiểm tra token interval
-  useEffect(() => {
-    const intervalId = setInterval(checkAndUpdateUserData, 1000); // Kiểm tra mỗi giây
-    return () => clearInterval(intervalId);
-  }, []);
+  const isAdmin = userData?.roles?.includes("Admin");
 
   if (!AuthApi.isAuthenticated() || !userData) {
     return (
@@ -107,13 +102,11 @@ const UserMenu: React.FC = () => {
           <div className="px-4 py-2 border-b border-gray-100">
             <p className="font-medium text-gray-800">{userData.username}</p>
             <p className="text-sm text-gray-500">
-              {userData.roles?.includes("Admin")
-                ? "Quản trị viên"
-                : "Thành viên"}
+              {isAdmin ? "Quản trị viên" : "Thành viên"}
             </p>
           </div>
 
-          {userData.roles?.includes("Admin") && (
+          {isAdmin && (
             <Link
               to="/admin"
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"

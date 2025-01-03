@@ -6,7 +6,6 @@ import {
   AuthResponse,
 } from "../types/auth";
 import apiClient from "./api";
-import { Cookie } from "lucide-react";
 
 class AuthApi {
   /**
@@ -26,6 +25,11 @@ class AuthApi {
         // Lưu username vào sessionStorage
         if (response.data.username) {
           sessionStorage.setItem("username", response.data.username);
+        }
+
+        // Lưu roles vào sessionStorage
+        if (response.data.roles) {
+          sessionStorage.setItem("roles", JSON.stringify(response.data.roles));
         }
       }
 
@@ -61,6 +65,11 @@ class AuthApi {
         if (response.data.username) {
           sessionStorage.setItem("username", response.data.username);
         }
+
+        // Lưu roles vào sessionStorage
+        if (response.data.roles) {
+          sessionStorage.setItem("roles", JSON.stringify(response.data.roles));
+        }
       }
 
       return response.data;
@@ -81,6 +90,7 @@ class AuthApi {
   static logout(): void {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("username");
+    sessionStorage.removeItem("roles");
   }
 
   /**
@@ -95,6 +105,61 @@ class AuthApi {
    */
   static getUsername(): string | null {
     return sessionStorage.getItem("username");
+  }
+
+  /**
+   * Get user roles
+   */
+  static getRoles(): string[] {
+    const rolesStr = sessionStorage.getItem("roles");
+    if (!rolesStr) {
+      return [];
+    }
+    try {
+      return JSON.parse(rolesStr);
+    } catch (error) {
+      console.error("Error parsing roles:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Check if user has specific role
+   */
+  static hasRole(role: string): boolean {
+    const roles = this.getRoles();
+    return roles.includes(role);
+  }
+
+  /**
+   * Check if user is admin
+   */
+  static isAdmin(): boolean {
+    return this.hasRole("Admin");
+  }
+
+  /**
+   * Decode JWT token and get roles
+   */
+  static getRolesFromToken(): string[] {
+    const token = sessionStorage.getItem("token");
+    if (!token) return [];
+
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      const payload = JSON.parse(jsonPayload);
+      return payload.data?.roles || [];
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return [];
+    }
   }
 }
 
