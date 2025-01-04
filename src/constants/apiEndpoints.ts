@@ -1,5 +1,5 @@
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost/webbanhang";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8081/webbanhang";
 
 export const API_ENDPOINTS = {
   PRODUCTS: {
@@ -17,9 +17,19 @@ export const API_ENDPOINTS = {
     CHECKOUT: `${API_BASE_URL}/ProductApi/processcheckout`,
     REMOVE: `${API_BASE_URL}/ProductApi/removeFromCart`,
   },
+  CATEGORIES: {
+    LIST: `${API_BASE_URL}/CategoryApi`,
+    CREATE: `${API_BASE_URL}/CategoryApi/store`,
+    UPDATE: `${API_BASE_URL}/CategoryApi/update`,
+    DELETE: `${API_BASE_URL}/CategoryApi/delete`,
+  },
+
   AUTH: {
     LOGIN: `${API_BASE_URL}/AccountApi/Login`,
     REGISTER: `${API_BASE_URL}/AccountApi/Register`,
+  },
+  USERS: {
+    LIST: `${API_BASE_URL}/api/Account/getAllAccounts`, // Endpoint để lấy tất cả người dùng
   },
 } as const;
 
